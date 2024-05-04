@@ -1,13 +1,18 @@
-import { execSync } from 'node:child_process';
 import request from 'supertest';
-import { expect, it, beforeAll, afterAll, describe, beforeEach } from 'vitest';
+import { expect, it, beforeAll, afterAll, describe, afterEach } from 'vitest';
 import { faker } from '@faker-js/faker';
 
 import { app } from '../src/app';
+import { knex } from '../src/database';
 import { type User } from '../src/interfaces';
 
 describe('users routes', () => {
-  let user: User;
+  const user: User = {
+    id: faker.string.uuid(),
+    session_id: faker.string.uuid(),
+    email: faker.internet.email(),
+    name: faker.person.fullName()
+  };
 
   beforeAll(async () => {
     await app.ready();
@@ -17,16 +22,8 @@ describe('users routes', () => {
     await app.close();
   });
 
-  beforeEach(() => {
-    execSync('npm run knex:test migrate:rollback --all');
-    execSync('npm run knex:test migrate:latest');
-
-    user = {
-      id: faker.string.uuid(),
-      session_id: faker.string.uuid(),
-      email: faker.internet.email(),
-      name: faker.person.fullName()
-    };
+  afterEach(async () => {
+    await knex('users').where({ id: user.id }).delete();
   });
 
   it('should be able to create a new user', async () => {

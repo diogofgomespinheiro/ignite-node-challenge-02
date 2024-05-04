@@ -21,6 +21,7 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
 
     const [user] = await knex('users')
       .insert({
+        id: randomUUID(),
         session_id: randomUUID(),
         email: userData.email,
         name: userData.name
@@ -28,7 +29,7 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
       .returning('*');
     setSessionCookie(response, user.session_id);
 
-    return response.status(201).send();
+    return response.status(201).send({ user });
   });
 }
 
