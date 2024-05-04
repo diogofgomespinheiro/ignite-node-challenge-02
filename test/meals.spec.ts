@@ -187,9 +187,7 @@ describe('meals routes', () => {
 
   describe('get metrics endpoint', () => {
     it('should return 401 if user does not exist', async () => {
-      const response = await request(app.server).delete(
-        `/meals/${faker.string.uuid()}`
-      );
+      const response = await request(app.server).get('/meals/metrics');
       expect(response.statusCode).toBe(401);
     });
 
